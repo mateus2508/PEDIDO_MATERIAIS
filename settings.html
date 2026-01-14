@@ -3,165 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações - NetLinks</title>
+    <title>Estoque SAP - Mercado Livre Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #E50914; --bg: #141414; --card: #2f2f2f; }
-        body { background-color: var(--bg); color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 40px 20px; }
+        :root { --ml-yellow: #fff159; --bg: #ebebeb; --blue: #3483fa; --text: #333; --green: #00a650; }
+        body { background-color: var(--bg); font-family: 'Arial', sans-serif; margin: 0; color: var(--text); }
         
-        /* Estilo da Tela de Login */
-        #login-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg); display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 1000;
-        }
-        .login-box { background: var(--card); padding: 40px; border-radius: 12px; text-align: center; border: 1px solid #444; }
+        /* Header ML */
+        header { background-color: var(--ml-yellow); padding: 10px 5%; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .search-container { flex-grow: 1; position: relative; }
+        .search-container input { width: 100%; padding: 10px 15px; border: none; border-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); outline: none; font-size: 16px; }
         
-        /* Esconde o conteúdo até logar */
-        #main-content { display: none; }
+        .cart-icon { position: relative; cursor: pointer; font-size: 24px; }
+        .cart-count { position: absolute; top: -8px; right: -10px; background: #e50914; color: white; font-size: 12px; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
 
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 { color: var(--primary); text-align: center; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; }
+        /* Grid de Itens */
+        .container { padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .item-card { background: white; border-radius: 4px; padding: 15px; transition: 0.3s; display: flex; flex-direction: column; border-bottom: 3px solid transparent; }
+        .item-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--blue); }
         
-        .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        .config-card { background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid #444; }
-        h2 { font-size: 18px; margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; color: #eee; }
+        .sap-code { color: #666; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+        .item-title { font-size: 15px; font-weight: 400; color: #333; margin: 0 0 10px 0; line-height: 1.2; height: 36px; overflow: hidden; }
+        .item-stock { font-size: 14px; color: var(--green); font-weight: bold; margin-top: auto; }
+        .item-loc { font-size: 11px; color: #999; margin-bottom: 10px; }
         
-        label { display: block; margin: 15px 0 5px; font-size: 13px; color: #aaa; }
-        input, select { width: 100%; padding: 12px; border-radius: 4px; background: #444; color: white; border: 1px solid #555; box-sizing: border-box; }
-        
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-size: 14px; }
-        .btn-add { background: #27ae60; color: white; }
-        .btn-del { background: var(--primary); color: white; }
-        .btn-nav { background: #444; color: white; margin-top: 20px; }
+        .btn-add { background: var(--blue); color: white; border: none; width: 100%; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; margin-top: 10px; transition: 0.2s; }
+        .btn-add:hover { background: #2968c8; }
 
-        #status-msg { text-align: center; margin-bottom: 20px; font-weight: bold; min-height: 20px; }
-
-        @media (max-width: 768px) { .section-grid { grid-template-columns: 1fr; } }
+        /* Modal Carrinho lateral */
+        #modal-cart { display: none; position: fixed; right: 0; top: 0; width: 350px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); z-index: 200; padding: 20px; box-sizing: border-box; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-item { padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; display: flex; justify-content: space-between; }
+        .btn-finish { background: var(--green); color: white; border: none; width: 100%; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 4px; margin-top: 20px; }
+        
+        #order-text { background: #f0f0f0; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-top: 15px; display: none; white-space: pre-wrap; }
+        
+        @media (max-width: 600px) { #modal-cart { width: 100%; } }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2 style="border:none; margin-bottom:20px;"><i class="fas fa-lock"></i> Acesso Restrito</h2>
-            <input type="password" id="passInput" placeholder="Digite a senha mestre">
-            <button class="btn btn-add" onclick="checkPass()">ENTRAR</button>
-            <a href="index.html" style="color:#aaa; text-decoration:none; display:block; margin-top:20px; font-size:12px;">Voltar ao início</a>
-        </div>
+<header>
+    <div style="font-weight: bold; font-size: 22px; letter-spacing: -1px;">SAP<span style="color:var(--blue)">ESTOQUE</span></div>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por SAP ou nome do item..." onkeyup="filtrar()">
     </div>
-
-    <div id="main-content">
-        <div class="container">
-            <h1><i class="fas fa-cog"></i> Configurações</h1>
-            <div id="status-msg"></div>
-
-            <div class="section-grid">
-                <div class="config-card">
-                    <h2><i class="fas fa-folder"></i> Categorias</h2>
-                    <label>Nova Categoria:</label>
-                    <input type="text" id="novaCat" placeholder="Nome do segmento...">
-                    <button class="btn btn-add" onclick="enviarDados('addCategory', 'novaCat')">CRIAR CATEGORIA</button>
-                    <hr style="border: 0; border-top: 1px solid #444; margin: 25px 0 15px;">
-                    <label>Excluir Categoria (e banners):</label>
-                    <select id="selectDelCat"><option>Carregando...</option></select>
-                    <button class="btn btn-del" onclick="confirmarExclusaoCat()">EXCLUIR COMPLETA</button>
-                </div>
-
-                <div class="config-card">
-                    <h2><i class="fas fa-image"></i> Banners</h2>
-                    <a href="cadastro.html" class="btn btn-add" style="margin-top: 15px;"><i class="fas fa-plus"></i> NOVO BANNER</a>
-                    <hr style="border: 0; border-top: 1px solid #444; margin: 25px 0 15px;">
-                    <label>Escolha a Categoria:</label>
-                    <select id="selectCatBanner" onchange="filtrarBanners()"><option value="">Selecione...</option></select>
-                    <label>Escolha o Banner:</label>
-                    <select id="selectBanner" disabled><option value="">Selecione...</option></select>
-                    <button class="btn btn-del" id="btnDelBanner" onclick="deletarBanner()" disabled>EXCLUIR BANNER</button>
-                </div>
-            </div>
-
-            <div class="footer-nav">
-                <a href="index.html" class="btn btn-nav" style="max-width: 200px; margin: 0 auto;"><i class="fas fa-arrow-left"></i> VOLTAR</a>
-            </div>
-        </div>
+    <div class="cart-icon" onclick="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
     </div>
+</header>
 
-    <script>
-        // --- CONFIGURAÇÃO DE ACESSO ---
-        const SENHA_MESTRE = "1234"; // <--- MUDE SUA SENHA AQUI!
+<div class="container" id="catalog">
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #999;">
+        <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Carregando estoque atualizado...
+    </div>
+</div>
 
-        function checkPass() {
-            const input = document.getElementById('passInput').value;
-            if(input === Mps.2026) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                carregarDados();
-            } else {
-                alert("Senha Incorreta!");
-            }
+<div id="modal-cart">
+    <div class="cart-header">
+        <h3>Solicitação de Itens</h3>
+        <i class="fas fa-times" onclick="toggleCart()" style="cursor:pointer"></i>
+    </div>
+    <div id="cart-list" style="max-height: 60vh; overflow-y: auto;"></div>
+    <button class="btn-finish" onclick="gerarPedido()">FECHAR PEDIDO E COPIAR</button>
+    <div id="order-text"></div>
+</div>
+
+<script>
+    const URL_SCRIPT = "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT";
+    let db = [];
+    let cart = [];
+
+    async function load() {
+        try {
+            const r = await fetch(URL_SCRIPT);
+            db = await r.json();
+            render(db);
+        } catch (e) { alert("Erro ao carregar dados da planilha."); }
+    }
+
+    function render(list) {
+        const catalog = document.getElementById('catalog');
+        if(list.length === 0) {
+            catalog.innerHTML = '<p style="grid-column:1/-1; text-align:center">Nenhum item encontrado.</p>';
+            return;
         }
+        catalog.innerHTML = list.map(item => `
+            <div class="item-card">
+                <div class="sap-code">SAP: ${item.sap}</div>
+                <h2 class="item-title">${item.nome}</h2>
+                <div class="item-loc">Centro: ${item.centro} | DP: ${item.dp}</div>
+                <div class="item-stock">${item.disponivel} ${item.unidade} disponíveis</div>
+                <button class="btn-add" onclick="addToCart('${item.sap}')">Adicionar</button>
+            </div>
+        `).join('');
+    }
 
-        // Permite apertar 'Enter' para entrar
-        document.getElementById('passInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkPass();
+    function filtrar() {
+        const val = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = db.filter(i => 
+            i.nome.toLowerCase().includes(val) || 
+            i.sap.toString().includes(val)
+        );
+        render(filtered);
+    }
+
+    function addToCart(sap) {
+        const item = db.find(i => i.sap == sap);
+        const exists = cart.find(c => c.sap == sap);
+        if(exists) exists.qtd++;
+        else cart.push({...item, qtd: 1});
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        document.getElementById('cartCount').innerText = cart.reduce((s, i) => s + i.qtd, 0);
+        const list = document.getElementById('cart-list');
+        list.innerHTML = cart.map(i => `
+            <div class="cart-item">
+                <span><b>${i.qtd}x</b> ${i.nome}</span>
+                <span>SAP: ${i.sap}</span>
+            </div>
+        `).join('');
+    }
+
+    function toggleCart() {
+        const m = document.getElementById('modal-cart');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function gerarPedido() {
+        if(cart.length === 0) return alert("Carrinho vazio!");
+        let t = `📋 *SOLICITAÇÃO DE MATERIAL - SAP*\n`;
+        t += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        cart.forEach(i => {
+            t += `🔹 *${i.qtd}x* | SAP: ${i.sap}\n   ${i.nome}\n\n`;
         });
-
-        // --- RESTANTE DO SCRIPT ---
-        const urlApp = "https://script.google.com/macros/s/AKfycbxTQvfr6fsACUTjL3ay8yfVWy34HWlXpjUJjsZVzbvRF3F8OgXIJB35tcfwowMObvulVA/exec";
-        let dadosGlobais = {};
-
-        async function carregarDados() {
-            try {
-                const res = await fetch(urlApp);
-                dadosGlobais = await res.json();
-                const options = '<option value="">Selecione...</option>' + 
-                    dadosGlobais.categorias.filter(c => c).map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
-                document.getElementById('selectDelCat').innerHTML = options;
-                document.getElementById('selectCatBanner').innerHTML = options;
-            } catch (e) { console.error(e); }
-        }
-
-        function filtrarBanners() {
-            const cat = document.getElementById('selectCatBanner').value;
-            const selectB = document.getElementById('selectBanner');
-            const filtrados = dadosGlobais.banners.filter(b => b.categoria === cat);
-            selectB.innerHTML = '<option value="">Selecione o banner</option>' + 
-                filtrados.map(b => `<option value="${b.nome}">${b.nome}</option>`).join('');
-            selectB.disabled = filtrados.length === 0;
-        }
-
-        document.getElementById('selectBanner').addEventListener('change', function() {
-            document.getElementById('btnDelBanner').disabled = !this.value;
+        t += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        t += `📍 Gerado em: ${new Date().toLocaleString()}`;
+        
+        const box = document.getElementById('order-text');
+        box.innerText = t;
+        box.style.display = 'block';
+        
+        navigator.clipboard.writeText(t).then(() => {
+            alert("Pedido copiado com sucesso! Agora cole no Google Chat.");
         });
+    }
 
-        async function enviarDados(acao, idCampo) {
-            const valor = document.getElementById(idCampo).value;
-            if(!valor) return alert("Preencha o campo!");
-            mostrarStatus("Processando...", "#aaa");
-            await fetch(urlApp, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: acao, nome: valor }) });
-            mostrarStatus("Sucesso!", "#27ae60");
-            setTimeout(() => location.reload(), 1500);
-        }
-
-        async function confirmarExclusaoCat() {
-            const cat = document.getElementById('selectDelCat').value;
-            if(!cat || !confirm(`Apagar a categoria "${cat}" removerá TUDO. Confirma?`)) return;
-            await enviarDados('deleteCategory', 'selectDelCat');
-        }
-
-        async function deletarBanner() {
-            const cat = document.getElementById('selectCatBanner').value;
-            const nome = document.getElementById('selectBanner').value;
-            mostrarStatus("Excluindo...", "#aaa");
-            await fetch(urlApp, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", categoria: cat, nome: nome }) });
-            mostrarStatus("Removido!", "#27ae60");
-            setTimeout(() => location.reload(), 1500);
-        }
-
-        function mostrarStatus(txt, cor) {
-            const m = document.getElementById('status-msg');
-            m.innerText = txt; m.style.color = cor;
-        }
-    </script>
+    window.onload = load;
+</script>
 </body>
 </html>
